@@ -36,7 +36,7 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         private lateinit var model:NewsModel
         fun bind(){
             model = news[adapterPosition]
-            Glide.with(App.instance.getContext()).load(model.cover).into(binding.newsCoverImageView)
+            Glide.with(binding.root.context).load(model.cover).into(binding.newsCoverImageView)
             binding.titleTextView.text = model.titleKA
         }
     }
