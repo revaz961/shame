@@ -9,16 +9,16 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val _newsLiveData = MutableLiveData<Result<List<NewsModel>>>().apply {
+    private val _newsLiveData = MutableLiveData<Response<List<NewsModel>>>().apply {
         mutableListOf<NewsModel>()
     }
     val newsLiveData = _newsLiveData
 
     fun init() {
         CoroutineScope(Dispatchers.IO).launch {
-            newsLiveData.postValue(Result(Result.Status.LOADING))
+            newsLiveData.postValue(Response.Loading(true))
             getNews()
-            newsLiveData.postValue(Result(Result.Status.LOADING))
+            newsLiveData.postValue(Response.Loading(false))
         }
     }
 
@@ -27,9 +27,9 @@ class MainViewModel : ViewModel() {
         val result = RetrofitService.retrofitService().getNews()
         val news = result.body()
         if (result.isSuccessful && news != null) {
-            newsLiveData.postValue(Result(Result.Status.SUCCESS,news))
+            newsLiveData.postValue(Response.Success(news))
         }else{
-            newsLiveData.postValue(Result(Result.Status.ERROR,news))
+            newsLiveData.postValue(Response.Error(news!!,result.errorBody().toString()))
         }
     }
 }

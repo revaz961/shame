@@ -5,14 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.retrofitapplication.databinding.FragmentMainBinding
 import com.example.retrofitapplication.model.MainViewModel
-import com.example.retrofitapplication.model.Result
+import com.example.retrofitapplication.model.Response
 
 class MainFragment : Fragment() {
 
@@ -49,18 +47,18 @@ class MainFragment : Fragment() {
 
     private fun observes() {
         mainViewModel.newsLiveData.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Result.Status.SUCCESS -> {
+            when (it) {
+                is Response.Success -> {
                     adapter!!.setNews(it.data!!)
                 }
-                Result.Status.ERROR -> {
+                is Response.Error -> {
                     Toast.makeText(requireActivity(), it.message, Toast.LENGTH_LONG)
                 }
-                Result.Status.LOADING -> {
-                    if (binding!!.progress.visibility == View.VISIBLE)
-                        binding!!.progress.visibility = View.GONE
-                    else
+                is Response.Loading -> {
+                    if (it.loading)
                         binding!!.progress.visibility = View.VISIBLE
+                    else
+                        binding!!.progress.visibility = View.GONE
                 }
             }
         })
