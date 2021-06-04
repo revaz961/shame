@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.retrofitapplication.databinding.FragmentMainBinding
 import com.example.retrofitapplication.model.MainViewModel
 import com.example.retrofitapplication.model.Response
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
@@ -31,11 +33,15 @@ class MainFragment : Fragment() {
 
     private fun init() {
         initRecycler()
-        observes()
-        binding!!.btnLoad.setOnClickListener {
-            binding!!.btnLoad.visibility = View.GONE
-            mainViewModel.init()
-        }
+        loadNews()
+    }
+
+    private fun loadNews(){
+        mainViewModel.getNews().observe(viewLifecycleOwner,{
+            lifecycleScope.launch {
+                adapter!!.submitData(it)
+            }
+        })
     }
 
     private fun initRecycler() {
@@ -45,22 +51,22 @@ class MainFragment : Fragment() {
 
     }
 
-    private fun observes() {
-        mainViewModel.newsLiveData.observe(viewLifecycleOwner, {
-            when (it) {
-                is Response.Success -> {
-                    adapter!!.setNews(it.data!!)
-                }
-                is Response.Error -> {
-                    Toast.makeText(requireActivity(), it.message, Toast.LENGTH_LONG)
-                }
-                is Response.Loading -> {
-                    if (it.loading)
-                        binding!!.progress.visibility = View.VISIBLE
-                    else
-                        binding!!.progress.visibility = View.GONE
-                }
-            }
-        })
-    }
+//    private fun observes() {
+//        mainViewModel.newsLiveData.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is Response.Success -> {
+//                    adapter!!.setNews(it.data!!)
+//                }
+//                is Response.Error -> {
+//                    Toast.makeText(requireActivity(), it.message, Toast.LENGTH_LONG)
+//                }
+//                is Response.Loading -> {
+//                    if (it.loading)
+//                        binding!!.progress.visibility = View.VISIBLE
+//                    else
+//                        binding!!.progress.visibility = View.GONE
+//                }
+//            }
+//        })
+//    }
 }
